@@ -61,9 +61,6 @@ def main():
     if srt_only:
         return
 
-    # bash command to download a youtube video with `youtube-dl` and save it as `video.mp4`:
-    # youtube-dl -f 22 -o video.mp4 https://www.youtube.com/watch?v=QH2-TGUlwu4
-
     for path, srt_path in subtitles.items():
         out_path = os.path.join(output_dir, f"{filename(path)}.mp4")
 
@@ -72,7 +69,7 @@ def main():
         video = ffmpeg.input(path)
         audio = video.audio
 
-        stderr = ffmpeg.concat(
+        ffmpeg.concat(
             video.filter('subtitles', srt_path, force_style="OutlineColour=&H40000000,BorderStyle=3"), audio, v=1, a=1
         ).output(out_path).run(quiet=True, overwrite_output=True)
 
@@ -99,12 +96,12 @@ def get_audio(paths):
 
 
 def get_subtitles(audio_paths: list, output_srt: bool, output_dir: str, transcribe: callable):
-    srt_path = output_dir if output_srt else tempfile.gettempdir()
     subtitles_path = {}
 
     for path, audio_path in audio_paths.items():
+        srt_path = output_dir if output_srt else tempfile.gettempdir()
         srt_path = os.path.join(srt_path, f"{filename(path)}.srt")
-
+        
         print(
             f"Generating subtitles for {filename(path)}... This might take a while."
         )
